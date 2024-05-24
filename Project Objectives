@@ -1,0 +1,9 @@
+Main objectives:
+- Create a fully functional Connect 4 game.
+- It should include a starting menu.
+- It should include an basic AI which will play with the user.
+- The user should have the ability to start a new game after completing the previous one.
+- The menu should also include a "Help" option, which lists some basic instructions and rules of the game.
+
+Additional features which we would like to add:
+- Upgrade the basic AI. We could program it to make smarter moves and also give comments when the user makes a mistake.
