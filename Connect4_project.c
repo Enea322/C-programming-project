@@ -1,6 +1,49 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Function declarations
+void displayMenu();
+void displayBasicRules();
+void displayStrategies();
+void displayAdditionalTips();
+void displayHelp();
+void displayPlayOptions();
+void displayPlayOptions();
+void playAgainstComputer();
+void initializeBoard(char board[6][7]);
+void displayBoard(char board[6][7]);
+int makeMove(char board[6][7], int col, char disc);
+int checkWin(char board[6][7], char disc);
+int isBoardFull(char board[6][7]);
+int getComputerMove(char board[6][7]);
+
+int main() {
+    int choice;
+
+    while (1) {
+        displayMenu();
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                displayPlayOptions();
+                break;
+            case 2:
+                displayHelp();
+                break;
+            case 3:
+                printf("Exiting the game. Goodbye!\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please enter 1, 2, or 3.\n");
+        }
+
+        printf("\n"); // Add a newline for better readability
+    }
+
+    return 0;
+}
+
 void displayMenu() {
     printf("Connect Four Game\n");
     printf("*****************\n");
@@ -109,8 +152,8 @@ void displayPlayOptions() {
                 // For now does nothing
                 break;
             case 2:
-                printf("You selected to play against the computer.\n");
-                 // For now does nothing
+                 playAgainstComputer();
+                return; // After the game ends, return to the main menu
                 break;
             case 3:
                 return; // Return to main menu
@@ -123,29 +166,141 @@ void displayPlayOptions() {
     }
 }
 
-int main() {
-    int choice;
+void playAgainstComputer() {
+    char board[6][7];
+    int playerTurn = 1; // 1 for player, 0 for computer
+    int col;
+    char playerDisc = 'O';
+    char computerDisc = 'X';
+
+    initializeBoard(board);
 
     while (1) {
-        displayMenu();
-        scanf("%d", &choice);
+        displayBoard(board);
 
-        switch (choice) {
-            case 1:
-                displayPlayOptions();
-                break;
-            case 2:
-                displayHelp();
-                break;
-            case 3:
-                printf("Exiting the game. Goodbye!\n");
-                exit(0);
-            default:
-                printf("Invalid choice. Please enter 1, 2, or 3.\n");
+        if (playerTurn) {
+            printf("Player's turn (O). Enter column (0-6): ");
+            scanf("%d", &col);
+
+            if (col < 0 || col > 6 || !makeMove(board, col, playerDisc)) {
+                printf("Invalid move. Try again.\n");
+                continue;
+            }
+        } else {
+            col = getComputerMove(board);
+            printf("Computer's turn (X). It chooses column %d\n", col);
+            makeMove(board, col, computerDisc);
         }
 
-        printf("\n"); // Add a newline for better readability
+        if (checkWin(board, playerTurn ? playerDisc : computerDisc)) {
+            displayBoard(board);
+            printf("%s wins!\n", playerTurn ? "Player" : "Computer");
+            break;
+        }
+
+        if (isBoardFull(board)) {
+            displayBoard(board);
+            printf("The game is a draw!\n");
+            break;
+        }
+
+        playerTurn = !playerTurn; // Switch turns
+    }
+
+    printf("\nPress Enter to return to the main menu...");
+    getchar(); // Wait for user input
+    getchar(); // Wait for Enter key
+}
+
+void initializeBoard(char board[6][7]) {
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            board[i][j] = ' ';
+        }
+    }
+}
+
+void displayBoard(char board[6][7]) {
+    printf("\n 0 1 2 3 4 5 6\n");
+    printf("---------------\n");
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 7; j++) {
+            if (board[i][j] == 'O') {
+                 printf("O"); // Prints 'O' for the player
+            } else {
+                printf("%c ", board[i][j]);
+            }
+        }
+        printf("\n");
+    }
+    printf("---------------\n");
+}
+
+int makeMove(char board[6][7], int col, char disc) {
+    for (int i = 5; i >= 0; i--) {
+        if (board[i][col] == ' ') {
+            board[i][col] = disc;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int checkWin(char board[6][7], char disc) {
+    // Check horizontal
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == disc && board[i][j + 1] == disc && board[i][j + 2] == disc && board[i][j + 3] == disc) {
+                return 1;
+            }
+        }
+    }
+
+    // Check vertical
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 7; j++) {
+            if (board[i][j] == disc && board[i + 1][j] == disc && board[i + 2][j] == disc && board[i + 3][j] == disc) {
+                return 1;
+            }
+        }
+    }
+
+    // Check diagonal (bottom-left to top-right)
+    for (int i = 3; i < 6; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == disc && board[i - 1][j + 1] == disc && board[i - 2][j + 2] == disc && board[i - 3][j + 3] == disc) {
+                return 1;
+            }
+        }
+    }
+
+    // Check diagonal (top-left to bottom-right)
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == disc && board[i + 1][j + 1] == disc && board[i + 2][j + 2] == disc && board[i + 3][j + 3] == disc) {
+                return 1;
+            }
+        }
     }
 
     return 0;
+}
+
+int isBoardFull(char board[6][7]) {
+    for (int i = 0; i < 7; i++) {
+        if (board[0][i] == ' ') {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int getComputerMove(char board[6][7]) {
+    // Simple AI: Choose the first available column
+    for (int i = 0; i < 7; i++) {
+        if (board[0][i] == ' ') {
+            return i;
+        }
+    }
+    return -1; // This should never happen if the game is not a draw
 }
