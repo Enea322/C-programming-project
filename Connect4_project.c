@@ -221,19 +221,17 @@ void initializeBoard(char board[6][7]) {
 }
 
 void displayBoard(char board[6][7]) {
+     system("clear"); // Clears the screen
     printf("\n 0 1 2 3 4 5 6\n");
     printf("---------------\n");
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 7; j++) {
-            if (board[i][j] == 'O') {
-                 printf("O"); // Prints 'O' for the player
-            } else {
-                printf("%c ", board[i][j]);
-            }
+            printf("|%c", board[i][j]);
         }
-        printf("\n");
+        printf("|\n");
+        printf("---------------\n");
     }
-    printf("---------------\n");
+
 }
 
 int makeMove(char board[6][7], int col, char disc) {
@@ -247,60 +245,129 @@ int makeMove(char board[6][7], int col, char disc) {
 }
 
 int checkWin(char board[6][7], char disc) {
-    // Check horizontal
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i][j + 1] == disc && board[i][j + 2] == disc && board[i][j + 3] == disc) {
-                return 1;
+    char computerDisc = 'X';
+    char playerDisc = 'O';
+
+    // Check if the computer can win in the next move
+    for (int col = 0; col < 7; col++) {
+        if (makeMove(board, col, computerDisc)) {
+            if (checkWin(board, computerDisc)) {
+                // Undo move
+                for (int i = 0; i < 6; i++) {
+                    if (board[i][col] == computerDisc) {
+                        board[i][col] = ' ';
+                        break;
+                    }
+                }
+                return col;
+            }
+            // Undo move
+            for (int i = 0; i < 6; i++) {
+                if (board[i][col] == computerDisc) {
+                    board[i][col] = ' ';
+                    break;
+                }
             }
         }
     }
 
-    // Check vertical
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 7; j++) {
-            if (board[i][j] == disc && board[i + 1][j] == disc && board[i + 2][j] == disc && board[i + 3][j] == disc) {
-                return 1;
+    // Check if the player can win in the next move, and block them
+    for (int col = 0; col < 7; col++) {
+        if (makeMove(board, col, playerDisc)) {
+            if (checkWin(board, playerDisc)) {
+                // Undo move
+                for (int i = 0; i < 6; i++) {
+                    if (board[i][col] == playerDisc) {
+                        board[i][col] = ' ';
+                        break;
+                    }
+                }
+                return col;
+            }
+            // Undo move
+            for (int i = 0; i < 6; i++) {
+                if (board[i][col] == playerDisc) {
+                    board[i][col] = ' ';
+                    break;
+                }
             }
         }
     }
 
-    // Check diagonal (bottom-left to top-right)
-    for (int i = 3; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i - 1][j + 1] == disc && board[i - 2][j + 2] == disc && board[i - 3][j + 3] == disc) {
-                return 1;
-            }
+    // Try to take the center column if possible
+    if (board[0][3] == ' ') {
+        return 3;
+    }
+
+    // Pick the first available column (fallback)
+    for (int col = 0; col < 7; col++) {
+        if (board[0][col] == ' ') {
+            return col;
         }
     }
 
-    // Check diagonal (top-left to bottom-right)
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i + 1][j + 1] == disc && board[i + 2][j + 2] == disc && board[i + 3][j + 3] == disc) {
-                return 1;
-            }
-        }
-    }
-
-    return 0;
+    return -1; // This should never happen if the game is not a draw
 }
+char computerDisc = 'X';
+    char playerDisc = 'O';
 
-int isBoardFull(char board[6][7]) {
-    for (int i = 0; i < 7; i++) {
-        if (board[0][i] == ' ') {
-            return 0;
+    // Check if the computer can win in the next move
+    for (int col = 0; col < 7; col++) {
+        if (makeMove(board, col, computerDisc)) {
+            if (checkWin(board, computerDisc)) {
+                // Undo move
+                for (int i = 0; i < 6; i++) {
+                    if (board[i][col] == computerDisc) {
+                        board[i][col] = ' ';
+                        break;
+                    }
+                }
+                return col;
+            }
+            // Undo move
+            for (int i = 0; i < 6; i++) {
+                if (board[i][col] == computerDisc) {
+                    board[i][col] = ' ';
+                    break;
+                }
+            }
         }
     }
-    return 1;
-}
 
-int getComputerMove(char board[6][7]) {
-    // Simple AI: Choose the first available column
-    for (int i = 0; i < 7; i++) {
-        if (board[0][i] == ' ') {
-            return i;
+    // Check if the player can win in the next move, and block them
+    for (int col = 0; col < 7; col++) {
+        if (makeMove(board, col, playerDisc)) {
+            if (checkWin(board, playerDisc)) {
+                // Undo move
+                for (int i = 0; i < 6; i++) {
+                    if (board[i][col] == playerDisc) {
+                        board[i][col] = ' ';
+                        break;
+                    }
+                }
+                return col;
+            }
+            // Undo move
+            for (int i = 0; i < 6; i++) {
+                if (board[i][col] == playerDisc) {
+                    board[i][col] = ' ';
+                    break;
+                }
+            }
         }
     }
+
+    // Try to take the center column if possible
+    if (board[0][3] == ' ') {
+        return 3;
+    }
+
+    // Pick the first available column (fallback)
+    for (int col = 0; col < 7; col++) {
+        if (board[0][col] == ' ') {
+            return col;
+        }
+    }
+
     return -1; // This should never happen if the game is not a draw
 }
