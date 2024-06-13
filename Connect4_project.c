@@ -387,164 +387,265 @@ int isBoardFull(char board[6][7]) {
 }
 
 int getComputerMove(char board[6][7], char disc) {
-    // Better (but still simple) AI: 
+    // Better (but still simple) AI:
+
+    int c = 0; //Current considered column
+    int dev = 0; //Deviations from "4-in-a-row"
 
     // First: Chooses the first available win
 
     // Check horizontal
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i][j + 1] == disc && board[i][j + 2] == disc && board[i][j + 3] == ' ') {
-                if (i >= 1) {
-                    if (board[i - 1][j + 3] != ' ') {
-                        return j + 3;
+    for (int i = 5, c = 0, dev = 0; i >= 0; i--) {
+        for (int j = 0; j < 4 || dev < 2; j++) {
+            if (board[i][j] == ' ' || board[i][j] == disc) {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++;
+                for (; j < 7 && dev < 2; j++) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != disc) {
+                        dev = 2;
+                    }
+                    if (board[i + 1][j] == ' ') {
+                        dev = 2;
                     }
                 }
-                return j + 3;
             }
         }
-    }
-    // Reverse
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i][j + 1] == disc && board[i][j + 2] == disc && board[i][j + 3] == ' ') {
-                if (i >= 1) {
-                    if (board[i - 1][j + 3] != ' ') {
-                        return j;
-                    }
-                }
-                return j;
-            }
+        if (dev < 2) {
+            return c;
         }
     }
-
     // Check vertical
-    for (int i = 0; i < 3; i++) {
+    for (int i = 5; i > 2; i--) {
         for (int j = 0; j < 7; j++) {
-            if (board[i][j] == disc && board[i + 1][j] == disc && board[i + 2][j] == disc && board[i + 3][j] == ' ') {
+            if (board[i][j] == disc && board[i - 1][j] == disc && board[i - 2][j] == disc && board[i - 3][j] == ' ') {
                 return j;
             }
         }
     }
-
     // Check diagonal (bottom-left to top-right)
-    for (int i = 3; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i - 1][j + 1] == disc && board[i - 2][j + 2] == disc && board[i - 3][j + 3] == ' ') {
-                if (i >= 4) {
-                    if (board[i - 4][j + 3] != ' ') {
-                        return j + 3;
+    for (int i = 5, c = 0, dev = 0; i >= 0; i--) {
+        for (int j = 0; j < 4 || dev < 2; j++) {
+            if (board[i][j] == ' ' || board[i][j] == disc) {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++, i--;
+                for (; j < 7 && dev < 2 && i >= 0; j++, i--) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != disc) {
+                        dev = 2;
+                    }
+                    if (board[i + 1][j] == ' ') {
+                        dev = 2;
+                    }
+
+                }
+            }
+        }
+        if (dev < 2) {
+            return c;
+        }
+    }
+    // Check diagonal (top-left to bottom-right)
+    for (int i = 0, c = 0, dev = 0; i <= 5; i++) {
+        for (int j = 0; j < 4 || dev < 2; j++) {
+            if (board[i][j] == ' ' || board[i][j] == disc) {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++, i++;
+                for (; j < 7 && dev < 2 && i >= 0; j++, i++) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != disc) {
+                        dev = 2;
+                    }
+                    if (i + 1 != 5) {
+                        if (board[i + 1][j] == ' ') {
+                            dev = 2;
+                        }
                     }
                 }
-                return j + 3;
             }
         }
-    }
-    // Reverse
-    for (int i = 3; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i - 1][j + 1] == disc && board[i - 2][j + 2] == disc && board[i - 3][j + 3] == disc && board[i - 1][j] != ' ') {
-                return j;
-            }
-        }
-    }
-
-    // Check diagonal (top-left to bottom-right)
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == disc && board[i + 1][j + 1] == disc && board[i + 2][j + 2] == disc && board[i + 3][j + 3] == ' ' && board[i - 1][j + 3] != ' ') {
-                return j + 3;
-            }
-        }
-    }
-    // Reverse
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i + 1][j + 1] == disc && board[i + 2][j + 2] == disc && board[i + 3][j + 3] == disc && board[i - 1][j + 3] != disc) {
-                return j;
-            }
+        if (dev < 2) {
+            return c;
         }
     }
 
     // Second:Prevents the players win
 
     // Check horizontal
-    for (int i = 0; i < 6; i++) {
+    for (int i = 5, c = 0, dev = 0; i >= 0; i--) {
         for (int j = 0; j < 4; j++) {
-            if (board[i][j] == 'O' && board[i][j + 1] == 'O' && board[i][j + 2] == 'O' && board[i][j + 3] == ' ' && board[i - 1][j + 3] != ' ') {
-                return j + 3;
+            if (board[i][j] == ' ' || board[i][j] == 'O') {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++;
+                for (; j < 7 && dev < 2; j++) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != 'O') {
+                        dev = 2;
+                    }
+                    if (board[i + 1][j] == ' ') {
+                        dev = 2;
+                    }
+                }
             }
         }
-    }
-    // Reverse
-    for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i][j + 1] == 'O' && board[i][j + 2] == 'O' && board[i][j + 3] == 'O' && board[i - 1][j] != ' ') {
-                return j;
-            }
+        if (dev < 2) {
+            return c;
         }
     }
-
     // Check vertical
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 7; j++) {
-            if (board[i][j] == 'O' && board[i + 1][j] == 'O' && board[i + 2][j] == 'O' && board[i + 3][j] == ' ') {
+    for (int i = 5; i > 2; i--) {
+        for (int j = 0, dev = 0; j < 7; j++) {
+            if (board[i][j] == 'O' && board[i - 1][j] == 'O' && board[i - 2][j] == 'O' && board[i - 3][j] == ' ') {
                 return j;
             }
         }
     }
-
     // Check diagonal (bottom-left to top-right)
-    for (int i = 3; i < 6; i++) {
+    for (int i = 5, c = 0, dev = 0; i >= 0; i--) {
         for (int j = 0; j < 4; j++) {
-            if (board[i][j] == 'O' && board[i - 1][j + 1] == 'O' && board[i - 2][j + 2] == 'O' && board[i - 3][j + 3] == ' ' && board[i - 4][j + 3] != ' ') {
-                return j + 3;
+            if (board[i][j] == ' ' || board[i][j] == 'O') {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++, i--;
+                for (; j < 7 && dev < 2 && i >= 0; j++, i--) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != 'O') {
+                        dev = 2;
+                    }
+                    if (board[i + 1][j] == ' ') {
+                        dev = 2;
+                    }
+
+                }
             }
         }
-    }
-    // Reverse
-    for (int i = 3; i < 6; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i - 1][j + 1] == 'O' && board[i - 2][j + 2] == 'O' && board[i - 3][j + 3] == 'O' && board[i - 1][j] != ' ') {
-                return j;
-            }
+        if (dev < 2) {
+            return c;
         }
     }
-
-
     // Check diagonal (top-left to bottom-right)
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0, c = 0, dev = 0; i <= 5; i++) {
         for (int j = 0; j < 4; j++) {
-            if (board[i][j] == 'O' && board[i + 1][j + 1] == 'O' && board[i + 2][j + 2] == 'O' && board[i + 3][j + 3] == ' ' && board[i - 1][j + 3] != ' ') {
-                return j + 3;
+            if (board[i][j] == ' ' || board[i][j] == 'O') {
+                if (board[i][j] == ' ') {
+                    dev++;
+                    c = j;
+                }
+                j++, i++;
+                for (; j < 7 && dev < 2 && i >= 0; j++, i++) {
+                    if (board[i][j] == ' ') {
+                        if (i != 5) {
+                            if (board[i + 1][j] != ' ') {
+                                dev++;
+                                c = j;
+                            }
+                        }
+                        else {
+                            dev++;
+                            c = j;
+                        }
+                    }
+                    else if (board[i][j] != 'O') {
+                        dev = 2;
+                    }
+                    if (i + 1 != 5) {
+                        if (board[i + 1][j] == ' ') {
+                            dev = 2;
+                        }
+                    }
+                }
             }
         }
-    }
-    // Reverse
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 4; j++) {
-            if (board[i][j] == ' ' && board[i + 1][j + 1] == 'O' && board[i + 2][j + 2] == 'O' && board[i + 3][j + 3] == 'O' && board[i - 1][j] != ' ') {
-                return j;
-            }
+        if (dev < 2) {
+            return c;
         }
     }
 
     // Third: Chooses a column
 
     // Tries to take the center column
-    if (board[0][2] == ' ') {
-        return 2;
+    if (board[5][3] == ' ') {
+        return 3;
     }
-    // Chooses the first and lowest uneven column
-    for (int i = 0; i < 6; i++) {
+    // Chooses the first and lowest uneven column spot
+    for (int i = 5; 0 <= i; i--) {
         for (int j = 0; j < 7; j++, j++) {
             if (board[i][j] == ' ') {
                 return j;
             }
         }
     }
-    // Chooses the first available column (fallback)
-    for (int i = 0; i < 6; i++) {
+    // Chooses the first & lowest available spot (fallback)
+    for (int i = 5; i >= 6; i--) {
         for (int j = 0; j < 7; j++) {
             if (board[i][j] == ' ') {
                 return j;
