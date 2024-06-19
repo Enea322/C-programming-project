@@ -14,6 +14,7 @@ void playAgainstComputer();
 void playAgainstPlayer();
 void initializeBoard(char board[6][7]);
 void displayBoard(char board[6][7]);
+int getRounds();
 int makeMove(char board[6][7], int col, char disc);
 int checkWin(char board[6][7], char disc);
 int isBoardFull(char board[6][7]);
@@ -175,20 +176,84 @@ void displayPlayOptions() {
     }
 }
 
+int getRounds() {
+
+    int gameChoice;
+
+    while (1) {
+        system("cls");
+        printf("Game Choices:\n");
+        printf("*****************\n");
+        printf("1. Quickplay (1 Round)\n");
+        printf("2. Best of three\n");
+        printf("3. Best of five\n");
+        printf("4. Best of seven\n");
+        printf("Enter your choice: ");
+        scanf_s("%d", &gameChoice);
+
+        switch (gameChoice) {
+        case 1:
+            return 1;
+            break;
+        case 2:
+            return 2;
+            break;
+        case 3:
+            return 3;
+            break;
+        case 4:
+            return 4;
+            break;
+        default:
+            printf("Invalid choice.\n");
+            _getch();
+        }
+        printf("\n");
+    }
+}
+
 void playAgainstComputer() {
     char board[6][7];
     int playerTurn = 1; // 1 for player, 0 for computer
     int col;
+    int rounds;
+    int playerScore = 0;
+    int computerScore = 0;
     char playerDisc = 'O';
     char computerDisc = 'X';
 
+    rounds = getRounds();
     initializeBoard(board);
 
     while (1) {
         system("cls");
         displayBoard(board);
 
-        if (playerTurn == 1) {
+        if (checkWin(board, playerTurn ? playerDisc : computerDisc)) {
+
+            if (playerTurn == 1) {
+                playerScore++;
+            }
+            else {
+                computerScore++;
+            }
+            system("cls");
+            displayBoard(board);
+
+            if (rounds == playerScore || rounds == computerScore) {
+
+                printf("%s wins!\n", playerTurn ? "Player" : "Computer");
+
+                break;
+            }
+            else {
+
+                printf("%s wins this round!\n", playerTurn ? "Player" : "Computer");
+
+            }
+        }
+
+        if (playerTurn) {
             printf("Player's turn (O). Enter column (0-6): ");
             scanf_s("%d", &col);
 
@@ -197,18 +262,11 @@ void playAgainstComputer() {
                 continue;
             }
         }
-        if (playerTurn == 0) {
+        if (!playerTurn) {
             col = getComputerMove(board, computerDisc);
             printf("Computer's turn (X). It chooses column %d\n", col);
             makeMove(board, col, computerDisc);
             _getch();
-        }
-
-        if (checkWin(board, playerTurn ? playerDisc : computerDisc)) {
-            system("cls");
-            displayBoard(board);
-            printf("%s wins!\n", playerTurn ? "Player" : "Computer");
-            break;
         }
 
         if (isBoardFull(board)) {
@@ -217,7 +275,7 @@ void playAgainstComputer() {
             printf("The game is a draw!\n");
             break;
         }
-        // Switch Player to AI
+        // Switch between Player & AI
         if (playerTurn == 1) {
             playerTurn = 0;
         }
@@ -235,13 +293,40 @@ void playAgainstPlayer() {
     char board[6][7];
     int playerTurn = 0; // 0 for Player 1, 1 for Player 2
     int col;
+    int rounds = 0;
     char player1Disc = 'O';
     char player2Disc = 'X';
+    int player1Score = 0;
+    int player2Score = 0;
 
+    rounds += getRounds();
     initializeBoard(board);
 
     while (1) {
         displayBoard(board);
+
+        if (checkWin(board, playerTurn ? player1Disc : player2Disc)) {
+
+            system("cls");
+            displayBoard(board);
+            if (playerTurn == 0) {
+                player1Score++;
+            }
+            else {
+                player2Score++;
+            }
+
+            if (rounds == player1Score || rounds == player2Score) {
+                printf("%s wins!\n", playerTurn ? "Player 1" : "Player 2");
+                break;
+            }
+            else {
+                printf("%s wins this round!\n", playerTurn ? "Player 1" : "Player 2");
+                _getch();
+                initializeBoard(board);
+                displayBoard(board);
+            }
+        }
 
         if (playerTurn == 0) {
             printf("Player 1's turn (O). Enter column (0-6): ");
@@ -263,14 +348,6 @@ void playAgainstPlayer() {
                 continue;
             }
         }
-
-        if (checkWin(board, playerTurn ? player1Disc : player2Disc)) {
-            system("cls");
-            displayBoard(board);
-            printf("%s wins!\n", playerTurn ? "Player 1" : "Player 2");
-            break;
-        }
-
         if (isBoardFull(board)) {
             system("cls");
             displayBoard(board);
@@ -285,9 +362,8 @@ void playAgainstPlayer() {
             playerTurn = 0;
         }
     }
-
     printf("\nPress Enter to return to the main menu...");
-    scanf_s(""); // Wait for user input
+    _getch(); // Wait for user input
 }
 
 void initializeBoard(char board[6][7]) {
@@ -299,6 +375,7 @@ void initializeBoard(char board[6][7]) {
 }
 
 void displayBoard(char board[6][7]) {
+    system("cls");
     printf("\n  0   1   2   3   4   5   6 \n");
     printf("-----------------------------\n");
     for (int i = 0; i < 6; i++) {
